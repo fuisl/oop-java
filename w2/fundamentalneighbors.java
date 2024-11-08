@@ -15,18 +15,9 @@ public class fundamentalneighbors {
 
     public static long solve(int n) {
         long res = 1;
-        int k = 0;
 
-        while (n % 2 == 0) {
-            n /= 2;
-            ++k;
-        }
-        if (k > 0) {
-            res *= Math.pow(k, 2);
-        }
-
-        for (int i = 3; i * i <= n; i += 2) {
-            k = 0;
+        for (int i = 2; i * i <= n; i++) {
+            int k = 0;
             while (n % i == 0) {
                 n /= i;
                 ++k;

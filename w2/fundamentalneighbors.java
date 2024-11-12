@@ -16,7 +16,7 @@ public class fundamentalneighbors {
     public static long solve(int n) {
         long res = 1;
 
-        for (int i = 2; i * i <= n; i++) {
+        for (int i = 3; i * i <= n; i += 2) {
             int k = 0;
             while (n % i == 0) {
                 n /= i;

@@ -2,78 +2,61 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 public class primereduction {
 
+    private static HashMap<Integer, Integer> cache = new HashMap<>();
+
     public static void main(String[] args) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        String currentLine;
+        String line;
 
-        // Generate small primes up to sqrt(1,000,000,000) for use in segmentation
-        int limit = (int) Math.sqrt(1000000000);
-        boolean[] smallPrimes = sieve(limit);
-        List<Integer> primes = new ArrayList<>();
-        for (int i = 2; i <= limit; i++) {
-            if (smallPrimes[i]) {
-                primes.add(i);
-            }
-        }
-
-        while (!(currentLine = reader.readLine()).equals("4")) {
-            int n = Integer.parseInt(currentLine);
-            int count = 1;
-            primeReduction(n, primes, count);
-        }
-    }
-
-    public static void primeReduction(int n, List<Integer> primes, int count) {
-        if (isPrime(n, primes)) {  // Check if n is prime within segment
-            System.out.printf("%d %d\n", n, count);
-            return;
-        }
-
-        int currentPrime = 2;
-        int sum = 0;
-        while (n > 1) {
-            if (isPrime(currentPrime, primes) && n % currentPrime == 0) {
-                sum += currentPrime;
-                n /= currentPrime;
-            } else {
-                currentPrime++;
-            }
-        }
-        primeReduction(sum, primes, count + 1);
-    }
-
-    public static boolean[] sieve(int n) {
-        boolean[] isPrime = new boolean[n + 1];
-        for (int i = 2; i <= n; i++) {
-            isPrime[i] = true;
-        }
-        for (int i = 2; i * i <= n; i++) {
-            if (isPrime[i]) {
-                for (int j = i * i; j <= n; j += i) {
-                    isPrime[j] = false;
-                }
-            }
-        }
-        return isPrime;
-    }
-
-    public static boolean isPrime(int n, List<Integer> smallPrimes) {
-        if (n < 2) {
-            return false;
-        }
-        for (int prime : smallPrimes) {
-            if (prime * prime > n) {
+        while ((line = reader.readLine()) != null) {
+            int n = Integer.parseInt(line);
+            if (n == 4) {
                 break;
             }
-            if (n % prime == 0) {
-                return false;
+
+            int steps = 1;
+            cache.put(2, -1);  // 2 is prime
+            while (true) {
+                if (cache.containsKey(n)) {
+                    if (cache.get(n) == -1) { // -1 -> n is already prime
+                        break;
+                    }
+                    n = cache.get(n);
+                    steps++;
+                    continue;
+                }
+
+                // sum of prime factors of n
+                int original = n;
+                int sum = 0;
+                while (n % 2 == 0) {
+                    sum += 2;
+                    n /= 2;
+                }
+                for (int i = 3; i * i <= n; i += 2) {
+                    while (n % i == 0) {
+                        sum += i;
+                        n /= i;
+                    }
+                }
+                if (n > 1) {
+                    sum += n;
+                }
+
+                // cache and update n
+                if (sum == original) {
+                    cache.put(original, -1); // mark as prime
+                    break;
+                }
+                cache.put(original, sum);
+                n = sum;
+                steps++;
             }
+            System.out.printf("%d %d\n", n, steps);
         }
-        return true;
     }
 }

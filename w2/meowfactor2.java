@@ -1,3 +1,4 @@
+// Method: https://en.wikipedia.org/wiki/Approximate_string_matching#Problem_formulation_and_algorithms
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,24 +10,7 @@ public class meowfactor2 {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         String s = reader.readLine();
         String meow = "meow";
-        if (s.length() < 4) {
-            System.out.println(levenshteinDistanceWithSwap(s, meow));
-            return;
-        }
-
-        int min = 4;
-        for (int length = 4; length <= s.length(); length++) {
-            for (int i = 0; i <= s.length() - length; i++) {
-                String sub = s.substring(i, i + length);
-                min = Math.min(min, levenshteinDistanceWithSwap(sub, meow));
-            }
-
-            if (min == 0) {
-                break;
-            }
-        }
-
-        System.out.println(min);
+        System.out.println(levenshteinDistanceWithSwap(meow, s));
     }
 
     public static int levenshteinDistanceWithSwap(String s1, String s2) {  // damerau-levenshtein distance
@@ -36,19 +20,28 @@ public class meowfactor2 {
         for (int i = 0; i <= m; i++) {
             for (int j = 0; j <= n; j++) {
                 if (i == 0) {
-                    dp[i][j] = j;
+                    dp[i][j] = 0;  // first row
                 } else if (j == 0) {
                     dp[i][j] = i;
                 } else if (s1.charAt(i - 1) == s2.charAt(j - 1)) {
                     dp[i][j] = dp[i - 1][j - 1];
                 } else {
-                    dp[i][j] = 1 + Math.min(dp[i - 1][j - 1], Math.min(dp[i - 1][j], dp[i][j - 1]));
+                    dp[i][j] = 1 + Math.min(
+                            dp[i - 1][j - 1], Math.min( // replace
+                                    dp[i - 1][j], // insert
+                                    dp[i][j - 1]));      // delete
                     if (i > 1 && j > 1 && s1.charAt(i - 1) == s2.charAt(j - 2) && s1.charAt(i - 2) == s2.charAt(j - 1)) {  // swap
                         dp[i][j] = Math.min(dp[i][j], dp[i - 2][j - 2] + 1);
                     }
                 }
             }
         }
-        return dp[m][n];
+
+        int minDistance = 4;
+        for (int j = 0; j <= n; j++) {
+            minDistance = Math.min(minDistance, dp[m][j]);  // last row
+        }
+
+        return minDistance;
     }
 }

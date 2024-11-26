@@ -1,0 +1,30 @@
+from math import floor
+
+temp = input().strip().split()
+m = int(temp[0])
+n = int(temp[1])
+
+def solve(m, n, p):
+    topLength = 112.5 * m
+    increment = topLength / n
+
+    topLength -= increment
+    alternate = p
+    blockCount = 0
+
+    while (topLength >= 225):
+        calcLength = topLength
+
+        if (alternate == 1):
+            calcLength -= 112.5
+            alternate = 0
+        else:
+            alternate = 1
+
+        blockCount += floor(calcLength / 225)
+
+        topLength -= increment
+    
+    return blockCount
+
+print(max(solve(m, n, 0), solve(m, n, 1), solve(n, m, 0), solve(n, m, 1)))
